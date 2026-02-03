@@ -34,12 +34,24 @@ case "$command" in
         echo "Branch: $(git branch --show-current)"
         echo "Last commit: $(git log -1 --format='%h - %s (%cr)' --relative-date)"
         echo ""
+        
+        # Generate fresh stats
+        node generate-stats.js > /dev/null 2>&1
+        
+        if [ -f "stats.json" ]; then
+            echo "Gallery Statistics:"
+            echo "Total entries: $(jq -r '.totalEntries' stats.json)"
+            echo "Total images: $(jq -r '.totalImages' stats.json)"
+            echo "First entry: $(jq -r '.firstEntry' stats.json)"
+            echo "Last entry: $(jq -r '.lastEntry' stats.json)"
+        else
+            echo "Total entries: $(ls -1 entries/*.md 2>/dev/null | wc -l)"
+        fi
+        echo ""
         echo "Recent entries:"
-        ls -1 entries/*.md | tail -5 | while read file; do
+        ls -1 entries/*.md 2>/dev/null | tail -5 | while read file; do
             basename "$file" .md
         done
-        echo ""
-        echo "Total entries: $(ls -1 entries/*.md | wc -l)"
         ;;
     "backup")
         echo "💾 Creating backup..."

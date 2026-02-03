@@ -37,9 +37,13 @@ echo "✅ Dependencies satisfied"
 echo "🚀 Generating today's entry..."
 node generate-daily.js
 
+# Generate stats
+echo "📊 Updating statistics..."
+node generate-stats.js
+
 # Git operations
 echo "📤 Committing and pushing changes..."
-git add entries/${TODAY}.md entries/${TODAY}.png index.html
+git add entries/${TODAY}.md entries/${TODAY}.png index.html stats.json
 git commit -m "Add ${TODAY} entry: $(grep -m1 '^# ' entries/${TODAY}.md | sed 's/^# //')"
 git push
 
