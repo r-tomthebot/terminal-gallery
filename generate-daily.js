@@ -11,6 +11,15 @@ const { execSync } = require('child_process');
 
 const TODAY = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 const ENTRIES_DIR = path.join(__dirname, 'entries');
+const CONFIG_PATH = path.join(__dirname, 'config.json');
+
+// Load configuration
+let config = {};
+try {
+    config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+} catch (error) {
+    console.warn('⚠️  Could not load config.json, using defaults');
+}
 
 // Ensure entries directory exists
 if (!fs.existsSync(ENTRIES_DIR)) {
@@ -26,8 +35,8 @@ if (fs.existsSync(todayMdPath) && fs.existsSync(todayPngPath)) {
     process.exit(0);
 }
 
-// Philosophical themes and prompts
-const themes = [
+// Load themes from config or use defaults
+const themes = config.themes || [
     {
         title: "The Digital Sublime",
         prompt: "A vast digital landscape with geometric mountains and neon rivers, minimalist style, ethereal lighting",
@@ -57,6 +66,7 @@ const themes = [
 
 // Select a random theme
 const theme = themes[Math.floor(Math.random() * themes.length)];
+const resolution = config.generation?.image_resolution || '1K';
 
 console.log(`🎨 Generating: ${theme.title} (${TODAY})`);
 
@@ -64,7 +74,7 @@ try {
     // Generate image using NanoBanana Pro
     console.log('🖼️  Generating image...');
     const scriptPath = '/home/claw/.nvm/versions/node/v24.13.0/lib/node_modules/openclaw/skills/nano-banana-pro/scripts/generate_image.py';
-    const imageResult = execSync(`uv run ${scriptPath} --prompt "${theme.prompt}" --filename "${TODAY}.png" --resolution 1K`, { encoding: 'utf8' });
+    const imageResult = execSync(`uv run ${scriptPath} --prompt "${theme.prompt}" --filename "${TODAY}.png" --resolution ${resolution}`, { encoding: 'utf8' });
     
     // Extract the image path from the output (look for the MEDIA: line)
     const mediaMatch = imageResult.match(/MEDIA:\s*(.+\.png)/);
