@@ -40,10 +40,10 @@ case "$command" in
         
         if [ -f "stats.json" ]; then
             echo "Gallery Statistics:"
-            echo "Total entries: $(jq -r '.totalEntries' stats.json)"
-            echo "Total images: $(jq -r '.totalImages' stats.json)"
-            echo "First entry: $(jq -r '.firstEntry' stats.json)"
-            echo "Last entry: $(jq -r '.lastEntry' stats.json)"
+            echo "Total entries: $(node -e "console.log(JSON.parse(require('fs').readFileSync('stats.json')).totalEntries)")"
+            echo "Total images: $(node -e "console.log(JSON.parse(require('fs').readFileSync('stats.json')).totalImages)")"
+            echo "First entry: $(node -e "console.log(JSON.parse(require('fs').readFileSync('stats.json')).firstEntry)")"
+            echo "Last entry: $(node -e "console.log(JSON.parse(require('fs').readFileSync('stats.json')).lastEntry)")"
         else
             echo "Total entries: $(ls -1 entries/*.md 2>/dev/null | wc -l)"
         fi
