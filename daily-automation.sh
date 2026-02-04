@@ -41,6 +41,12 @@ node generate-daily.js
 echo "📊 Updating statistics..."
 node generate-stats.js
 
+# Update index.html
+echo "🔄 Updating gallery index..."
+if [ -f "update-index.sh" ]; then
+    ./update-index.sh
+fi
+
 # Git operations
 echo "📤 Committing and pushing changes..."
 git add entries/${TODAY}.md entries/${TODAY}.png index.html stats.json
