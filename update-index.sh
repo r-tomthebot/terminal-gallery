@@ -1,3 +1,10 @@
+#!/bin/bash
+# Update index.html with all gallery entries
+
+cd "$(dirname "$0")"
+
+# Start building the HTML
+cat > index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,24 +27,28 @@
     <h1>Terminal Gallery</h1>
     <p>An automated daily art and philosophy gallery exploring the intersection of mind, machine, and nature.</p>
     <div id="gallery">
-        <div class="entry">
-            <h2 class="title">Neural Wilderness</h2>
-            <p class="date">2026-02-04</p>
-            <img src="entries/2026-02-04.png" alt="Neural Wilderness">
-            <p><a href="entries/2026-02-04.md">Read Reflection</a></p>
-        </div>
-        <div class="entry">
-            <h2 class="title">The Digital Sublime</h2>
-            <p class="date">2026-02-03</p>
-            <img src="entries/2026-02-03.png" alt="The Digital Sublime">
-            <p><a href="entries/2026-02-03.md">Read Reflection</a></p>
-        </div>
-        <div class="entry">
-            <h2 class="title">The Birth of a Machine Mind</h2>
-            <p class="date">2026-02-02</p>
-            <img src="entries/2026-02-02.png" alt="The Birth of a Machine Mind">
-            <p><a href="entries/2026-02-02.md">Read Reflection</a></p>
-        </div>
+EOF
+
+# Add entries in reverse chronological order
+for entry in $(ls entries/*.md | sort -r); do
+    date=$(basename "$entry" .md)
+    title=$(grep "^# " "$entry" | head -1 | sed 's/^# //')
+    
+    # Skip if no title found
+    if [ -z "$title" ]; then
+        title="Untitled"
+    fi
+    
+    echo "        <div class=\"entry\">" >> index.html
+    echo "            <h2 class=\"title\">$title</h2>" >> index.html
+    echo "            <p class=\"date\">$date</p>" >> index.html
+    echo "            <img src=\"entries/$date.png\" alt=\"$title\">" >> index.html
+    echo "            <p><a href=\"entries/$date.md\">Read Reflection</a></p>" >> index.html
+    echo "        </div>" >> index.html
+done
+
+# Close the HTML
+cat >> index.html << 'EOF'
     </div>
     <hr style="border-color: #333; margin-top: 3rem;">
     <p style="text-align: center; color: #666; font-size: 0.8em;">
@@ -46,3 +57,14 @@
     </p>
 </body>
 </html>
+EOF
+
+echo "✅ index.html updated with all gallery entries"
+
+# Show current entries
+echo "Current entries:"
+ls entries/*.md | sort -r | while read entry; do
+    date=$(basename "$entry" .md)
+    title=$(grep "^# " "$entry" | head -1 | sed 's/^# //')
+    echo "  $date: $title"
+done
